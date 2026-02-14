@@ -1,0 +1,6 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "cd backend && npm install"
+
+[deploy]
+startCommand = "cd backend && npm run worker"

@@ -1,0 +1,98 @@
+{
+  "name": "Reddit Automation Dashboard",
+  "description": "AI-powered Reddit marketing automation with Google Gemini",
+  "icon": "https://raw.githubusercontent.com/yassinenaimigoat-maker/reddit-automation-dashboard/main/frontend/public/vite.svg",
+  "services": {
+    "postgres": {
+      "source": {
+        "type": "database",
+        "database": "postgresql"
+      }
+    },
+    "redis": {
+      "source": {
+        "type": "database",
+        "database": "redis"
+      }
+    },
+    "backend": {
+      "source": {
+        "type": "github",
+        "repo": "yassinenaimigoat-maker/reddit-automation-dashboard",
+        "branch": "main",
+        "rootDirectory": "backend"
+      },
+      "env": {
+        "NODE_ENV": "production",
+        "PORT": "5001",
+        "DATABASE_URL": "${{postgres.DATABASE_URL}}",
+        "REDIS_URL": "${{redis.REDIS_URL}}",
+        "ADMIN_USERNAME": {
+          "description": "Admin dashboard username",
+          "default": "admin"
+        },
+        "ADMIN_PASSWORD": {
+          "description": "Admin dashboard password (change this!)",
+          "generator": {
+            "type": "secret"
+          }
+        },
+        "JWT_SECRET": {
+          "description": "Secret key for JWT tokens",
+          "generator": {
+            "type": "secret"
+          }
+        }
+      },
+      "build": {
+        "builder": "NIXPACKS"
+      },
+      "deploy": {
+        "startCommand": "npm start",
+        "healthcheck": {
+          "path": "/health",
+          "interval": 10
+        }
+      }
+    },
+    "worker": {
+      "source": {
+        "type": "github",
+        "repo": "yassinenaimigoat-maker/reddit-automation-dashboard",
+        "branch": "main",
+        "rootDirectory": "backend"
+      },
+      "env": {
+        "NODE_ENV": "production",
+        "DATABASE_URL": "${{postgres.DATABASE_URL}}",
+        "REDIS_URL": "${{redis.REDIS_URL}}",
+        "ADMIN_USERNAME": "${{backend.ADMIN_USERNAME}}",
+        "ADMIN_PASSWORD": "${{backend.ADMIN_PASSWORD}}",
+        "JWT_SECRET": "${{backend.JWT_SECRET}}"
+      },
+      "build": {
+        "builder": "NIXPACKS"
+      },
+      "deploy": {
+        "startCommand": "npm run worker"
+      }
+    },
+    "frontend": {
+      "source": {
+        "type": "github",
+        "repo": "yassinenaimigoat-maker/reddit-automation-dashboard",
+        "branch": "main",
+        "rootDirectory": "frontend"
+      },
+      "env": {
+        "VITE_API_URL": "https://${{backend.RAILWAY_PUBLIC_DOMAIN}}/api"
+      },
+      "build": {
+        "builder": "NIXPACKS"
+      },
+      "deploy": {
+        "startCommand": "npx serve -s dist -l $PORT"
+      }
+    }
+  }
+}

@@ -1,5 +1,7 @@
 # Reddit Marketing Automation Dashboard
 
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/reddit-automation?referralCode=bonus)
+
 A full-stack web application that automates Reddit marketing by browsing subreddits, finding relevant posts, and leaving natural, value-driven comments using AI.
 
 ## 🚀 Features
