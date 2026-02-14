@@ -62,7 +62,7 @@ function Configuration() {
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h2 className="text-xl font-bold text-white mb-4">AI Configuration</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 AI Provider
@@ -72,25 +72,87 @@ function Configuration() {
                 onChange={(e) => setConfig({ ...config, aiProvider: e.target.value })}
                 className="input-field"
               >
-                <option value="openai">OpenAI</option>
+                <option value="gemini">Google Gemini (Recommended)</option>
+                <option value="openai">OpenAI (GPT-4)</option>
                 <option value="anthropic">Anthropic (Claude)</option>
               </select>
+              <p className="text-gray-400 text-xs mt-1">
+                Choose your preferred AI provider for generating comments
+              </p>
             </div>
+
+            {config.aiProvider === 'gemini' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Google Gemini API Key
+                </label>
+                <input
+                  type="password"
+                  value={config.geminiApiKey || ''}
+                  onChange={(e) => setConfig({ ...config, geminiApiKey: e.target.value })}
+                  className="input-field"
+                  placeholder="AIza..."
+                />
+                <p className="text-gray-400 text-xs mt-1">
+                  Get your API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">Google AI Studio</a>
+                </p>
+              </div>
+            )}
+
+            {config.aiProvider === 'openai' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  OpenAI API Key
+                </label>
+                <input
+                  type="password"
+                  value={config.openaiApiKey || ''}
+                  onChange={(e) => setConfig({ ...config, openaiApiKey: e.target.value })}
+                  className="input-field"
+                  placeholder="sk-..."
+                />
+                <p className="text-gray-400 text-xs mt-1">
+                  Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">OpenAI Platform</a>
+                </p>
+              </div>
+            )}
+
+            {config.aiProvider === 'anthropic' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Anthropic API Key
+                </label>
+                <input
+                  type="password"
+                  value={config.anthropicApiKey || ''}
+                  onChange={(e) => setConfig({ ...config, anthropicApiKey: e.target.value })}
+                  className="input-field"
+                  placeholder="sk-ant-..."
+                />
+                <p className="text-gray-400 text-xs mt-1">
+                  Get your API key from <a href="https://console.anthropic.com/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">Anthropic Console</a>
+                </p>
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                {config.aiProvider === 'openai' ? 'OpenAI API Key' : 'Anthropic API Key'}
+                AI Model
               </label>
               <input
-                type="password"
-                value={config.aiProvider === 'openai' ? (config.openaiApiKey || '') : (config.anthropicApiKey || '')}
-                onChange={(e) => setConfig({ 
-                  ...config, 
-                  [config.aiProvider === 'openai' ? 'openaiApiKey' : 'anthropicApiKey']: e.target.value 
-                })}
+                type="text"
+                value={config.aiModel || ''}
+                onChange={(e) => setConfig({ ...config, aiModel: e.target.value })}
                 className="input-field"
-                placeholder="sk-..."
+                placeholder={
+                  config.aiProvider === 'gemini' ? 'gemini-pro' :
+                  config.aiProvider === 'openai' ? 'gpt-4-turbo-preview' :
+                  'claude-3-sonnet-20240229'
+                }
               />
+              <p className="text-gray-400 text-xs mt-1">
+                Leave empty to use default model
+              </p>
             </div>
           </div>
         </div>

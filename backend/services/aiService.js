@@ -1,5 +1,6 @@
 const OpenAI = require('openai');
 const Anthropic = require('@anthropic-ai/sdk');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 const logger = require('../utils/logger');
 const { Config } = require('../models');
 
@@ -7,6 +8,7 @@ class AIService {
   constructor() {
     this.openaiClient = null;
     this.anthropicClient = null;
+    this.geminiClient = null;
   }
 
   /**
@@ -32,6 +34,11 @@ class AIService {
       });
       logger.info('Anthropic client initialized');
     }
+
+    if (config.geminiApiKey) {
+      this.geminiClient = new GoogleGenerativeAI(config.geminiApiKey);
+      logger.info('Gemini client initialized');
+    }
   }
 
   /**
@@ -47,6 +54,8 @@ class AIService {
         commentText = await this.generateWithOpenAI(prompt, config.aiModel);
       } else if (config.aiProvider === 'anthropic' && this.anthropicClient) {
         commentText = await this.generateWithAnthropic(prompt);
+      } else if (config.aiProvider === 'gemini' && this.geminiClient) {
+        commentText = await this.generateWithGemini(prompt, config.aiModel);
       } else {
         throw new Error('No AI client available');
       }
@@ -174,6 +183,24 @@ INSTRUCTIONS:
   }
 
   /**
+   * Generate comment using Google Gemini
+   */
+  async generateWithGemini(prompt, model = 'gemini-pro') {
+    const genModel = this.geminiClient.getGenerativeModel({ model });
+    
+    const result = await genModel.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: {
+        temperature: 0.8,
+        maxOutputTokens: 300,
+      },
+    });
+
+    const response = await result.response;
+    return response.text().trim();
+  }
+
+  /**
    * Check if AI is properly configured
    */
   async isConfigured() {
@@ -184,6 +211,8 @@ INSTRUCTIONS:
       return !!config.openaiApiKey && !!this.openaiClient;
     } else if (config.aiProvider === 'anthropic') {
       return !!config.anthropicApiKey && !!this.anthropicClient;
+    } else if (config.aiProvider === 'gemini') {
+      return !!config.geminiApiKey && !!this.geminiClient;
     }
     
     return false;

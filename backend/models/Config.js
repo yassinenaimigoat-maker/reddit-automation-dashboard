@@ -10,8 +10,8 @@ const Config = sequelize.define('Config', {
   },
   // AI Configuration
   aiProvider: {
-    type: DataTypes.ENUM('openai', 'anthropic'),
-    defaultValue: 'openai'
+    type: DataTypes.ENUM('openai', 'anthropic', 'gemini'),
+    defaultValue: 'gemini'
   },
   openaiApiKey: {
     type: DataTypes.TEXT,
@@ -35,9 +35,20 @@ const Config = sequelize.define('Config', {
       return raw ? decrypt(raw) : null;
     }
   },
+  geminiApiKey: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    set(value) {
+      this.setDataValue('geminiApiKey', value ? encrypt(value) : null);
+    },
+    get() {
+      const raw = this.getDataValue('geminiApiKey');
+      return raw ? decrypt(raw) : null;
+    }
+  },
   aiModel: {
     type: DataTypes.STRING,
-    defaultValue: 'gpt-4-turbo-preview',
+    defaultValue: 'gemini-pro',
     comment: 'Specific model to use'
   },
   
