@@ -65,8 +65,12 @@ const startServer = async () => {
       logger.warn('Redis connection failed, some features may be limited');
     }
     
-    // Initialize AI service
-    await aiService.initialize();
+    // Initialize AI service (optional, will log error but continue)
+    try {
+      await aiService.initialize();
+    } catch (error) {
+      logger.warn('AI service initialization failed, configure API keys in dashboard');
+    }
     
     // Start server
     app.listen(PORT, '0.0.0.0', () => {
